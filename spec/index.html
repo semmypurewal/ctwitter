@@ -19,27 +19,25 @@
   <script type="text/javascript">
     (function() {
 	require.config({
-	    baseUrl: "../src"
+	    baseUrl: '../src'
 	});
 
-	require(["event_emitter","jsonp_poller"], function(EventEmitter, JSONPPoller)  {
+	require(["event_emitter", "jsonp_poller"], function(EventEmitter, JSONPPoller)  {
 	    //let's pollute the global namespace! Yay! (just for the tests)
-	    window.EventEmitter = EventEmitter;
 	    window.JSONPPoller = JSONPPoller;
+	    window.EventEmitter = EventEmitter;
 	    var jasmineEnv = jasmine.getEnv();
-	    jasmineEnv.updateInterval = 1000;
+	    //jasmineEnv.updateInterval = 1000;
 	    
 	    var trivialReporter = new jasmine.TrivialReporter();
 	    
 	    jasmineEnv.addReporter(trivialReporter);
 	    
-	    jasmineEnv.specFilter = function(spec) {
-		return trivialReporter.specFilter(spec);
-	    };
+	    //jasmineEnv.specFilter = function(spec) {
+	    //return trivialReporter.specFilter(spec);
+	    //};
 	    
-	    var currentWindowOnload = window.onload;
 	    jasmineEnv.execute();
-	    
 	});
     })();
   </script>

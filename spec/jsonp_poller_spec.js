@@ -4,36 +4,23 @@ describe('JSONP Poller', function() {
 	jp = new JSONPPoller();
     });
 
-    it('has a method called emits', function() {
-	expect(jp.emits).not.toBeUndefined();
+    it('is an instance of EventEmitter', function() {
+	expect(jp instanceof EventEmitter).toBeTruthy();
     });
 
-    it('has a method called on', function() {
-	expect(jp.on).not.toBeUndefined();
+    it('responds to data and error', function() {
+	expect(jp.emits().indexOf('error') > -1).toBeTruthy();
+	expect(jp.emits().indexOf('data') > -1).toBeTruthy();
     });
 
-    it('has a method called emit', function() {
-	expect(jp.emit).not.toBeUndefined();
-    });
 
-    it('has a method called url', function() {
-	expect(jp.url).not.toBeUndefined();
-    });
-
-    it('has a method called start', function() {
-	expect(jp.start).not.toBeUndefined();
-    });
-
-    it('has a method called stop', function() {
-	expect(jp.stop).not.toBeUndefined();
-    });
-
-    it('has a method called process', function() {
-	expect(jp.process).not.toBeUndefined();
-    });
-
-    it('has a method called isPolling', function() {
-	expect(jp.isPolling).not.toBeUndefined();
+    it('implements the JSONP Poller interface', function() {
+	var i;
+	var interface = ['url', 'start', 'stop', 'process', 'isPolling'];
+	for(i = 0; i < interface.length; i++) {
+	    expect(jp[interface[i]]).not.toBeUndefined();
+	    expect(typeof(jp[interface[i]]) === 'function').toBeTruthy();
+	}
     });
 
     describe('url method', function() {
@@ -63,18 +50,63 @@ describe('JSONP Poller', function() {
     });
 
     describe('start method', function() {
+	xit('starts polling', function() {
 
+	});
+
+	xit('adds a script tag to the head immediately', function() {
+
+	});
     });
 
     describe('stop method', function() {
+	xit('stops polling', function() {
 
+	});
+
+	xit('removes the script tag from the head immediately', function() {
+
+	});
     });
 
     describe('process method', function()  {
+	xit('accepts a function as an argument', function() {
 
+	});
+
+	xit('accepts a data object and then processes it', function() {
+
+	});
+
+	xit('is called when data is emitted', function() {
+
+	});
+
+	xit('throws an error if the argument is not a function or an object', function() {
+	    
+	});
+
+	xit('throws an error if the argument is an object but no function has been registered', function() {
+
+	});
     });
 
     describe('isPolling method', function() {
+	xit('returns false if it has not started', function() {
+	    expect(jp.isPolling()).toBeFalsy();
+	});
 
+	xit('returns true if it has started', function() {
+	    jp.start();
+	    expect(jp.isPolling()).toBeTruthy();
+	});
+
+	xit('toggles true and false between calls', function() {
+	    expect(jp.isPolling()).toBeFalsy();
+	    jp.start();
+	    expect(jp.isPolling()).toBeTruthy();
+	    jp.stop();
+	    expect(jp.isPolling()).toBeFalsy();
+	});
     });
 });

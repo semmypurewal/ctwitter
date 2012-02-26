@@ -4,16 +4,13 @@ describe('Event Emitter', function() {
 	e = new EventEmitter();
     });
 
-    it('has a method called emits', function() {
-	expect(e.emits).not.toBeUndefined();
-    });
-
-    it('has a method called on', function() {
-	expect(e.on).not.toBeUndefined();
-    });
-
-    it('has a method called emit', function() {
-	expect(e.emit).not.toBeUndefined();
+    it('implements the Event Emitter interface', function() {
+	var i;
+	var interface = ['emits', 'on', 'emit', 'listeners'];
+	for(i = 0; i < interface.length; i++) {
+	    expect(e[interface[i]]).not.toBeUndefined();
+	    expect(typeof(e[interface[i]]) === 'function').toBeTruthy();
+	}
     });
 
     describe('emits method', function() {
@@ -32,6 +29,28 @@ describe('Event Emitter', function() {
 		e.emits('event');
 	    }
 	    expect(badCall).toThrow(new Error('the argument to emits must be an array of events'));
+	});
+    });
+
+    describe('listeners method', function() {
+	beforeEach(function() {
+	    e.emits(['event','event1','event2']);
+	});
+
+	it('returns the listeners for a given event', function() {
+	    var listener1 = function() {
+	    };
+
+	    var listener2 = function() {
+	    };
+	
+	    e.on('event', listener1).on('event', listener2);
+	    expect(e.listeners('event').length).toBe(2);
+	    expect(e.listeners('event')).toEqual([listener1, listener2]);
+	});
+
+	it('throws an error if the method is called without a string', function() {
+	    expect(function() { e.listeners() }).toThrow(new Error('listeners method must be called with the name of an event'));
 	});
     });
 
@@ -56,6 +75,23 @@ describe('Event Emitter', function() {
 	    e.on('event2', function() { });
 	    expect(e.listeners('event1').length).toBe(1);
 	    expect(e.listeners('event2').length).toBe(1);
+	});
+
+	it('returns an instance of EventEmitter so the call can be chained', function() {
+	   expect(e.on('event', function() {}) instanceof EventEmitter).toBeTruthy();
+	});
+
+	it('registers callbacks to be registered in a chain', function() {
+	    e.on('event1', function() { })
+		.on('event2', function() { });
+	    expect(e.listeners('event1').length).toBe(1);
+	    expect(e.listeners('event2').length).toBe(1);	    
+	});
+
+	it('registers multiple callbacks for a single event in a chain', function() {
+	    e.on('event', function() { console.log("function 1") })
+		.on('event', function() { console.log("function 2") });
+	    expect(e.listeners('event').length).toBe(2);
 	});
 
 	it('throws an error if the event is not emitted', function() {
@@ -113,4 +149,6 @@ describe('Event Emitter', function() {
 	    expect(stubB).toHaveBeenCalledWith(5);
 	});
     }); //end description of 'emit' method
+
+
 });
