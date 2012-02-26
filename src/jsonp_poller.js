@@ -3,6 +3,7 @@ define(function(require, exports, module) {
 	JSONPPoller.prototype = new EventEmitter();
 	function JSONPPoller() {
 	    var url;
+	    this.emits(['error','data']);
 
 	    this.url = function(u) {
 		if(u === undefined && url === undefined) {

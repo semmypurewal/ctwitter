@@ -32,9 +32,9 @@ define(function(require, exports, module) {
 	    }
 	    if(listeners[event] === undefined) {
 		throw new Error("'"+event +"' is not emitted by this EventEmitter"); 
-		//listeners[event] = [];
 	    }
 	    listeners[event].push(listener);
+	    return this;
 	}
 
 	//emits an event
@@ -49,7 +49,9 @@ define(function(require, exports, module) {
 	
 	//get the listeners for an event
 	this.listeners = function(event) {
-	    if(listeners[event] === undefined) {
+	    if(typeof(event) !== 'string') {
+		throw new Error('listeners method must be called with the name of an event');
+	    } else if(listeners[event] === undefined) {
 		throw new Error("event '" + event + "' has not yet been registered");
 	    }
 	    return listeners[event];
