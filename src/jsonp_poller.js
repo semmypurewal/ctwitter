@@ -4,7 +4,8 @@ define(function(require, exports, module) {
 	JSONPPoller.instanceCount = 0;
 	function JSONPPoller() {
 	    var url;
-	    var timer = null;
+	    var count = 0; //number of requests made
+	    var timer = null; //timeout for next request
 	    var polling = false;
 	    var timeout = 0;
 	    JSONPPoller.instanceCount++;
@@ -23,6 +24,7 @@ define(function(require, exports, module) {
 		} else {
 		    url = u;
 		}
+		return this;
 	    };
 
 	    this.name = function() {
@@ -30,6 +32,7 @@ define(function(require, exports, module) {
 	    };
 
 	    this.start = function() {
+		var thisPoller = this;
 		try {
 		    this.url();
 		} catch(e) {
@@ -37,8 +40,7 @@ define(function(require, exports, module) {
 		}
 
 		polling = true;
-		var thisPoller = this;
-		
+		count++;
 		var head = document.getElementsByTagName('head')[0]; //assuming there is only 1 head?
 		var script = document.getElementById(this.name()+'_script_tag_id');
 		if(script) {
@@ -57,9 +59,15 @@ define(function(require, exports, module) {
 		};
 	    };
 
-
 	    this.stop = function() {
 		polling = false;
+		if(timer) {
+		    clearTimeout(timer);
+		}
+	    };
+
+	    this.count = function() {
+		return count;
 	    };
 
 	    this.process = function() {
@@ -73,7 +81,11 @@ define(function(require, exports, module) {
 		    throw new Error('timeout requires the parameter to be an integer');
 		} else {
 		    timeout = t;
+		    if(timeout === 0 && polling) {
+			this.stop();
+		    }
 		};
+		return this;
 	    };
 
 	    this.isPolling = function() {

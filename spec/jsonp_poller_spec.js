@@ -28,6 +28,10 @@ describe('JSONP Poller', function() {
 	    jp.url('http://www.thisisajsonfeed.com/feed.json');
 	});
 
+	it('returns the object when called as a setter method', function() {
+	    expect(jp.url('http://www.thisisajsonfeed.com/feed.json')).toEqual(jp);
+	});
+
 	it('returns a string that represents the current url it is polling', function() {
 	    jp.url('http://www.thisisajsonfeed.com/feed.json');
 	    var u = jp.url();
@@ -59,6 +63,18 @@ describe('JSONP Poller', function() {
 	    expect(jp.timeout()).toBe(30);
 	});
 
+	it('returns the object when called as a setter method', function() {
+	    expect(jp.timeout(20)).toEqual(jp);
+	});
+
+	it('stops polling if the timeout is set to 0', function() {
+	    jp.url('fixtures/public_timeline.json').timeout(20).start();
+	    jp.timeout(0);
+	    expect(jp.isPolling()).toBeFalsy();
+	});
+
+
+
 	it('throws an error on a non-numeric parameter', function() {
 	    var badCall = function() {
 		jp.timeout('hello');
@@ -75,8 +91,7 @@ describe('JSONP Poller', function() {
 
     describe('start method', function() {
 	beforeEach(function() {
-	    jp.url("fixtures/public_timeline.json");
-	    jp.start();
+	    jp.url('fixtures/public_timeline.json').start();
 	});
 
 	it('starts polling', function() {
@@ -90,8 +105,7 @@ describe('JSONP Poller', function() {
 
 	it('replaces the % in the callback with the name of this process function', function() {
 	    var jp2 = new JSONPPoller();
-	    jp2.url("fixtures/public_timeline.json?callback=%");
-	    jp2.start();
+	    jp2.url("fixtures/public_timeline.json?callback=%").start();
 
 	    var script = document.getElementById(jp2.name()+"_script_tag_id");
 	    expect(script.src.match(new RegExp("callback="+jp2.name()+".process"))).toBeTruthy();
@@ -101,7 +115,7 @@ describe('JSONP Poller', function() {
 	    var scripts = [];
 	    var script_tags;
 	    var i;
-	    jp.start();
+	    jp.start(); //call it a second time to make sure we don't add an extra script tag
 	    scripts = [];
 	    script_tags = document.getElementsByTagName('script');
 	    for(i = 0; i < script_tags.length; i++) {
@@ -112,12 +126,15 @@ describe('JSONP Poller', function() {
 	    expect(scripts.length).toBe(1);
 	});
 
-	xit('reloads and processes the data after the specified timeout', function() {
-	    jp.timeout(3);
-	    jp.start();
+	it('reloads and processes the data after the specified timeout', function() {
+	    var jp2 = new JSONPPoller();
+	    jp2.url('fixtures/public_timeline.json').timeout(1);
+	    expect(jp2.count()).toBe(0);
+	    jp2.start();
+	    expect(jp2.count()).toBe(1);
 	    waitsFor(function() {
-		//not sure how to test this yet
-	    }, "start never called a second time", 5000);
+		return (jp2.count() === 2);
+	    }, "start never called a second time", 2000);
 	});
 
 	it('throws error if no URL has been specified', function() {
@@ -130,12 +147,33 @@ describe('JSONP Poller', function() {
     });
 
     describe('stop method', function() {
-	xit('stops polling', function() {
-
+	var jp2;
+	beforeEach(function() {
+	    jp2 = new JSONPPoller();
+	    jp2.url('fixtures/public_timeline.json').timeout(2).start();
 	});
 
-	xit('removes the script tag from the head immediately', function() {
+	it('stops polling', function() {
+	    jp2.stop();
+	    expect(jp2.isPolling()).toBeFalsy();
+	});
 
+	it('cancels the expected next call to start', function() {
+	    jp2.stop();
+	    waits(3000);
+	    runs(function() {
+		expect(jp2.count()).not.toBe(2);
+	    });
+	});
+
+	it('removes the script tag from the head', function() {
+	    var script_tags;
+	    var i;
+	    jp2.stop();
+	    script_tags = document.getElementsByTagName('script');
+	    for(i = 0; i < script_tags.length; i++) {
+		expect(script_tags[i].id !== jp2.name()+'_script_tag_id');
+	    };
 	});
     });
 
@@ -155,8 +193,6 @@ describe('JSONP Poller', function() {
 	xit('emits data when new data is available', function() {
 
 	});
-
-
 
 	xit('emits error if an error is returned', function() {
 
