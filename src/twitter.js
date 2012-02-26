@@ -1,14 +1,13 @@
-require(["event_emitter"], function(ee) {
-    Stream.prototype = new ee();
+require(["event_emitter"], function(EventEmitter) {
+    Stream.prototype = new EventEmitter();
     function Stream() {
-	this.hello = function() {
-	    console.log("hello");
+	var varName =  "_tw";
+	var lastScriptTag;
+	
+	this.emits(['connect', 'data', 'end', 'error', 'destroy']);
+	
+	this.destroy = function() {
+
 	}
-    }
-    
-    
-    var s = new Stream();
-    for(var k in s) {
-	console.log(k);
     }
 });

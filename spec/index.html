@@ -14,13 +14,18 @@
 
     <!-- include spec files here... -->
     <script type="text/javascript" src="event_emitter_spec.js"></script>
-
+    <script type="text/javascript" src="jsonp_poller_spec.js"></script>
 
   <script type="text/javascript">
     (function() {
-	require(["../src/event_emitter"], function(EventEmitter)  {
+	require.config({
+	    baseUrl: "../src"
+	});
+
+	require(["event_emitter","jsonp_poller"], function(EventEmitter, JSONPPoller)  {
 	    //let's pollute the global namespace! Yay! (just for the tests)
 	    window.EventEmitter = EventEmitter;
+	    window.JSONPPoller = JSONPPoller;
 	    var jasmineEnv = jasmine.getEnv();
 	    jasmineEnv.updateInterval = 1000;
 	    

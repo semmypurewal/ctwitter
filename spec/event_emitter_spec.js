@@ -4,6 +4,18 @@ describe('Event Emitter', function() {
 	e = new EventEmitter();
     });
 
+    it('has a method called emits', function() {
+	expect(e.emits).not.toBeUndefined();
+    });
+
+    it('has a method called on', function() {
+	expect(e.on).not.toBeUndefined();
+    });
+
+    it('has a method called emit', function() {
+	expect(e.emit).not.toBeUndefined();
+    });
+
     describe('emits method', function() {
 	it('accepts an array of events that it emits', function() {
 	    e.emits(['event1', 'event2', 'event3']);
