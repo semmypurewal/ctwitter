@@ -70,7 +70,7 @@ define(function(require, exports, module) {
 		return count;
 	    };
 
-	    this.process = function() {
+	    this.process = function(f) {
 
 	    };
 
