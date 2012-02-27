@@ -5,12 +5,12 @@ describe('JSONP Poller', function() {
     });
 
     it('should be an instance of EventEmitter', function() {
-	expect(jp instanceof EventEmitter).toBeTruthy();
+	expect(jp instanceof EventEmitter).toBe(true);
     });
 
     it('should respond to data and error', function() {
-	expect(jp.emits().indexOf('error') > -1).toBeTruthy();
-	expect(jp.emits().indexOf('data') > -1).toBeTruthy();
+	expect(jp.emits().indexOf('error') > -1).toBe(true)
+	expect(jp.emits().indexOf('data') > -1).toBe(true);
     });
 
 
@@ -19,7 +19,7 @@ describe('JSONP Poller', function() {
 	var interface = ['url', 'start', 'stop', 'process', 'timeout', 'isPolling', 'name'];
 	for(i = 0; i < interface.length; i++) {
 	    expect(jp[interface[i]]).not.toBeUndefined();
-	    expect(typeof(jp[interface[i]]) === 'function').toBeTruthy();
+	    expect(typeof(jp[interface[i]]) === 'function').toBe(true);
 	}
     });
 
@@ -70,7 +70,7 @@ describe('JSONP Poller', function() {
 	it('should stop polling if the timeout is set to 0', function() {
 	    jp.url('fixtures/public_timeline.json').timeout(20).start();
 	    jp.timeout(0);
-	    expect(jp.isPolling()).toBeFalsy();
+	    expect(jp.isPolling()).toBe(false);
 	});
 
 	it('should throw an error on a non-numeric parameter', function() {
@@ -83,7 +83,7 @@ describe('JSONP Poller', function() {
 
     describe('name method', function() {
 	it('should return a string that is the name of this poller', function() {
-	    expect(typeof(jp.name()) === 'string').toBeTruthy();
+	    expect(typeof(jp.name()) === 'string').toBe(true);
 	});
     });
 
@@ -93,7 +93,7 @@ describe('JSONP Poller', function() {
 	});
 
 	it('should start polling', function() {
-	    expect(jp.isPolling()).toBeTruthy();
+	    expect(jp.isPolling()).toBe(true);
 	});
 
 	it('should add a script tag with URL to DOM', function() {
@@ -153,7 +153,7 @@ describe('JSONP Poller', function() {
 
 	it('should stop polling', function() {
 	    jp2.stop();
-	    expect(jp2.isPolling()).toBeFalsy();
+	    expect(jp2.isPolling()).toBe(false);
 	});
 
 	it('should cancel the expected next call to start', function() {
@@ -211,22 +211,22 @@ describe('JSONP Poller', function() {
 
     describe('isPolling method', function() {
 	it('should return false if it has not started', function() {
-	    expect(jp.isPolling()).toBeFalsy();
+	    expect(jp.isPolling()).toBe(false);
 	});
 
 	it('should return true if it has started', function() {
 	    jp.url("fixtures/public_timeline.json");
 	    jp.start();
-	    expect(jp.isPolling()).toBeTruthy();
+	    expect(jp.isPolling()).toBe(true);
 	});
 
 	it('should toggle true and false between calls', function() {
-	    expect(jp.isPolling()).toBeFalsy();
+	    expect(jp.isPolling()).toBe(false);
 	    jp.url("fixtures/public_timeline.json");
 	    jp.start();
-	    expect(jp.isPolling()).toBeTruthy();
+	    expect(jp.isPolling()).toBe(true);
 	    jp.stop();
-	    expect(jp.isPolling()).toBeFalsy();
+	    expect(jp.isPolling()).toBe(false);
 	});
     });
 });
