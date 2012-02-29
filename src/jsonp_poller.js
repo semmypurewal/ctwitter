@@ -8,9 +8,11 @@ define(function(require, exports, module) {
 	    var timer = null; //timeout for next request
 	    var polling = false;
 	    var timeout = 0;
+	    var processor = function(data) { return {update:true, data:data}; }; //default process implementation
 	    JSONPPoller.instanceCount++;
 	    var prefix = "__jp_";
 	    var name = prefix+JSONPPoller.instanceCount;
+	    window[name] = this;
 
 	    this.emits(['error','data']);
 
@@ -64,6 +66,11 @@ define(function(require, exports, module) {
 		if(timer) {
 		    clearTimeout(timer);
 		}
+		var script = document.getElementById(this.name()+'_script_tag_id');
+		if(script !== null) {
+		    var head = document.getElementsByTagName('head')[0];
+		    head.removeChild(script);
+		}
 	    };
 
 	    this.count = function() {
@@ -71,7 +78,23 @@ define(function(require, exports, module) {
 	    };
 
 	    this.process = function(f) {
-
+		var thisPoller = this;
+		var result;
+		if(typeof(f) === 'function') {
+		    processor = f;
+		    return thisPoller;
+		} else if (typeof(f) === 'object') {
+		    //do object stuff
+		    result = processor(f);
+		    if(result && result.error) {
+			this.emit('error', result.error);
+		    } else if(result && result.update) {
+			this.emit('data', result.data);
+		    }
+		    //return result.data;
+		} else {
+		    throw new Error('process requires the parameter to be an object or a function');
+		}
 	    };
 
 	    this.timeout = function(t) {

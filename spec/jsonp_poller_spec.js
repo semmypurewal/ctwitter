@@ -4,6 +4,8 @@ describe('JSONP Poller', function() {
 	jp = new JSONPPoller();
     });
 
+
+
     it('should be an instance of EventEmitter', function() {
 	expect(jp instanceof EventEmitter).toBe(true);
     });
@@ -92,6 +94,12 @@ describe('JSONP Poller', function() {
 	    jp.url('fixtures/public_timeline.json').start();
 	});
 
+	afterEach(function() {
+	    if(jp.isPolling()) {
+		jp.stop();
+	    }
+	});
+
 	it('should start polling', function() {
 	    expect(jp.isPolling()).toBe(true);
 	});
@@ -107,6 +115,7 @@ describe('JSONP Poller', function() {
 
 	    var script = document.getElementById(jp2.name()+"_script_tag_id");
 	    expect(script.src.match(new RegExp("callback="+jp2.name()+".process"))).toBeTruthy();
+	    jp2.stop();
 	});
 
 	it('should remove previous script tag from the DOM if it exists', function() {
@@ -115,6 +124,7 @@ describe('JSONP Poller', function() {
 	    var i;
 	    jp.start(); //call it a second time to make sure we don't add an extra script tag
 	    scripts = [];
+
 	    script_tags = document.getElementsByTagName('script');
 	    for(i = 0; i < script_tags.length; i++) {
 		if(script_tags[i].id !== 'undefined' && script_tags[i].id.match(jp.name())) {
@@ -130,9 +140,17 @@ describe('JSONP Poller', function() {
 	    expect(jp2.count()).toBe(0);
 	    jp2.start();
 	    expect(jp2.count()).toBe(1);
-	    waitsFor(function() {
-		return (jp2.count() === 2);
-	    }, "start never called a second time", 2000);
+	    runs( function() {
+		waitsFor(function() {
+		    var result = (jp2.count() === 2);
+		    return result;
+		}, "start never called a second time", 2000);
+	    });
+	    runs( function() {
+		jp2.stop();
+	    });
+
+
 	});
 
 	it('should throw error if no URL has been specified', function() {
@@ -153,6 +171,7 @@ describe('JSONP Poller', function() {
 
 	it('should stop polling', function() {
 	    jp2.stop();
+
 	    expect(jp2.isPolling()).toBe(false);
 	});
 
@@ -167,45 +186,89 @@ describe('JSONP Poller', function() {
 	it('should remove the script tag from the head', function() {
 	    var script_tags;
 	    var i;
-	    jp2.stop();
+	    jp2.stop()
 	    script_tags = document.getElementsByTagName('script');
 	    for(i = 0; i < script_tags.length; i++) {
-		expect(script_tags[i].id !== jp2.name()+'_script_tag_id');
+		expect(script_tags[i].id === jp2.name()+'_script_tag_id').toBe(false);
 	    };
 	});
     });
 
     describe('process method', function()  {
-	xit('should accept a function as an argument', function() {
+	var processStub = jasmine.createSpy('processStub');
+	beforeEach(function() {
+	    jp.process(function(o) {
+		o.data = {hello:"world"};
+		o.update = true;
+		return o;
+	    });
 
+	    processStub = jasmine.createSpy('processStub');
 	});
 
-	xit('should accept an object as an argument', function() {
-
+	it('should accept a function as an argument', function() {
+	    jp.process(function(data) {
+		//this is the process function
+	    });
 	});
 
-	xit('should be called after polling starts and data is returned from the URL', function() {
-	    var processStub = jasmine.createSpy();
+	it('should accept an object as an argument', function() {
+	    jp.process({hello:'world',key2:'value2'});
 	});
 
-	xit('should accept a data object and then processes it', function() {
-
+	it('should return the object when called as a setter method', function() {
+	    expect(jp.process(function(){ })).toEqual(jp);
 	});
 
-	xit('should emit data when new data is available', function() {
-
+	it('should be called after polling starts and data is returned from the URL', function() {
+	    var temp = function() { alert('hello!') };
+	    jp.url("fixtures/empty_object_with_callback.json").process(processStub);
+	    jp.start();
+	    waits(500);
+	    runs(function() {
+		expect(processStub).toHaveBeenCalledWith({});
+		jp.stop();
+	    });
 	});
 
-	xit('should emit error if an error is returned', function() {
-
+	it('should accept a data object and then processes it according to the process function', function() {
+	    var obj = {};
+	    jp.process(obj);
+	    expect(obj.data).toEqual({hello:'world'});
 	});
 
-	xit('should throw an error if the argument is not a function or an object', function() {
-	    
+	it('should emit data when update is set to true', function() {
+	    jp.on('data', processStub).process({});
+	    runs(function() {
+		expect(processStub).toHaveBeenCalledWith({hello:'world'});
+	    });
 	});
 
-	xit('should throw an error if the argument is an object but no function has been registered', function() {
+	it('should not emit data when update is set to false', function() {
+	    jp.process(function(data) {
+		var result = {};
+		result.data = data;
+		result.update = false;
+		return result;
+	    });
+	    jp.on('data', processStub).process({});
+	    expect(processStub).not.toHaveBeenCalled();
+	});
 
+	it('should emit error if an error is returned', function() {
+	    jp.process(function(data) {
+		var result = {};
+		result.data = data;
+		result.error = 'this is the error';
+		result.update = false;
+		return result;
+	    });
+	    jp.on('error', processStub).process({});
+	    expect(processStub).toHaveBeenCalled();
+	});
+
+	it('should throw an error if the argument is not a function or an object', function() {
+	    expect(function() {jp.process(5)}).toThrow(new Error('process requires the parameter to be an object or a function'));
 	});
     });
 
