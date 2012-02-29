@@ -16,6 +16,14 @@ define(function(require, exports, module) {
 
 	    this.emits(['error','data']);
 
+	    /**
+	     * url setter/getter
+	     * accepts a string that sets the URL of the JSONP feed
+	     * returns the current URL if called with no parameter
+	     * throws an error if:
+	     *   --non-string argument
+	     *   --called as a getter before the url is set
+	     */
 	    this.url = function(u) {
 		if(u === undefined && url === undefined) {
 		    throw new Error('url needs to be set before you call it as a getter');
@@ -29,10 +37,24 @@ define(function(require, exports, module) {
 		return this;
 	    };
 
+	    /**
+	     * name
+	     * returns the global name of this object
+	     */
 	    this.name = function() {
 		return name;
 	    };
 
+	    /**
+	     * start
+	     * starts polling
+	     * adds a script with the URL to the DOM
+	     * replaces callback=% with the actual callback based on the name
+	     * removes the previous script tag if it exists
+	     * reloads and reprocesses the data after the timeout
+	     * throws error if
+	     *   --url has not been specified
+	     */
 	    this.start = function() {
 		var thisPoller = this;
 		try {
@@ -61,6 +83,12 @@ define(function(require, exports, module) {
 		};
 	    };
 
+	    /**
+	     * stop
+	     * stops polling
+	     * cancels the next call to start
+	     * removes script tag from head
+	     */
 	    this.stop = function() {
 		polling = false;
 		if(timer) {
@@ -73,10 +101,21 @@ define(function(require, exports, module) {
 		}
 	    };
 
+	    //method only used for testing
+	    //keeps track of the number of times the
+	    //URL has been polled
 	    this.count = function() {
 		return count;
 	    };
 
+	    /**
+	     * process
+	     * accepts a function as an argument and sets it to the pre-processor
+	     * accepts an object as an argument and processes it, emitting new data
+	     *   if it is available
+	     * throws an error if
+	     *   --argument is not a function or an object
+	     */
 	    this.process = function(f) {
 		var thisPoller = this;
 		var result;
@@ -97,6 +136,14 @@ define(function(require, exports, module) {
 		}
 	    };
 
+	    /**
+	     * timeout
+	     * the default timeout is set to 0
+	     * accepts an integer that represents a timeout and stores it in timeout
+	     * returns the timeout when called with no parameters
+	     * throws error on:
+	     *   --non numeric parameter
+	     */
 	    this.timeout = function(t) {
 		if(t === undefined) {
 		    return timeout;
