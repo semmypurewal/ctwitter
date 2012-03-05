@@ -1,5 +1,5 @@
-define(function(require, exports, module) {
-    require(["event_emitter"], function(EventEmitter) {
+//define(function(require, exports, module) {
+//    require(["event_emitter"], function(EventEmitter) {
 	JSONPPoller.prototype = new EventEmitter();
 	JSONPPoller.instanceCount = 0;
 	function JSONPPoller() {
@@ -163,6 +163,6 @@ define(function(require, exports, module) {
 	    };
 	};
 
-	module.exports = JSONPPoller;
-    });
-});
+//module.exports = JSONPPoller;
+//    });
+//});

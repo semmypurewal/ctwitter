@@ -1,4 +1,4 @@
-define(function(require, exports, module) {
+//define(function(require, exports, module) {
     function EventEmitter() {
 	var listeners = {};
 	var emits = [];
@@ -58,5 +58,5 @@ define(function(require, exports, module) {
 	}
     }//end EventEmitter
 
-    module.exports = EventEmitter;
-});
+    //module.exports = EventEmitter;
+//});

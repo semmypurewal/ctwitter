@@ -1,5 +1,5 @@
-define(function(require, exports, module) {
-    require(["jsonp_poller", "event_emitter"], function(JSONPPoller, EventEmitter) {
+//define(function(require, exports, module) {
+//    require(["jsonp_poller", "event_emitter"], function(JSONPPoller, EventEmitter) {
 	function CTwitter() {
 
 	    /**
@@ -55,6 +55,6 @@ define(function(require, exports, module) {
 		//twitterPoller.start();
 	    }
 	}
-	module.exports = CTwitter;
-    });
-});
+//module.exports = CTwitter;
+//    });
+//});
