@@ -2,12 +2,25 @@
 <html>
   <head>
     <meta charset="UTF-8">
-    <script data-main="src/ctwitter.js" src="lib/requirejs-1.0.6/require.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="src/event_emitter.js"></script>
+    <script type="text/javascript" src="src/jsonp_poller.js"></script>
+    <script type="text/javascript" src="src/ctwitter.js"></script>
 
-    <script>
+    <script type="text/javascript">
+    $(document).ready(function() {
+	var twit = new CTwitter();
+	twit.stream('whatever', { }, function(stream) {
+	    stream.on('data', function(tweet) {
+		$("#tweets").append('<p>'+tweet.text+'</p>');
+	    });
+	});
+    });
     </script>
   </head>
 
   <body>
+    <div id="tweets">
+    </div>
   </body>
 </html>

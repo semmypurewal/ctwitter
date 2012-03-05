@@ -14,7 +14,16 @@ function CTwitter() {
     this.stream = function(mode, options, callback) {
 	var twitterPoller = new JSONPPoller()
 	, stream = new EventEmitter()
-	, buffer = [];
+	, buffer = []
+	, bufferTimeout
+	, deliverData = function(stream) {
+	    stream.emit('data',buffer.shift());
+	    if(buffer.length > 0) {
+		setTimeout(function() {
+		    deliverData(stream);
+		}, 750);
+	    }
+	};
 
 	if(arguments.length === 2) {
 	    callback = arguments[1];
@@ -31,27 +40,43 @@ function CTwitter() {
 	
 	stream.emits(['data','error','destroy']);
 	stream.destroy = function() { stream.emit('destroy'); };
-	stream.on('destroy', twitterPoller.stop);
+	stream.on('destroy', function() {
+	    twitterPoller.stop();
+	    clearTimeout(bufferTimeout);
+	});
 
-	
 	//process mode
 	
 	//process options
 	
-	twitterPoller.url('').timeout(60).process(function(data) {
+	twitterPoller.url('http://search.twitter.com/search.json?q=bieber&callback=%').timeout(25).process(function(data) {
+	    var i
+	    , nextUrl;
+
+	    //data = data.results;
+
 	    //check frequency of data to set up bufferTimeout
 	    //and next polling timeout
 	    
 	    //set up buffer to deliver data
-	    
+	    for(i = 0; i < data.results.length; i=i+1) {
+		buffer.push(data.results[i]);
+	    }
+
+	    //deliver data
+	    if(buffer.length > 0) {
+		deliverData(stream);
+	    }
+    
 	    //update poller and timeout for next request
-	    twitterPoller.url('').timeout(60);
+	    nextUrl = 'http://search.twitter.com/search.json' + data.refresh_url + '&callback=%';
+	    twitterPoller.url(nextUrl).timeout(25);
 	});
 
 	//set up the poller as specified by the client
 	callback(stream);
 	
 	//start the poller
-	//twitterPoller.start();
+	twitterPoller.start();
     };
 }
