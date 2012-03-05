@@ -1,5 +1,5 @@
 function CTwitter() {
-    
+  
     /**
      * stream
      * should accept mode, options and callback
@@ -12,6 +12,10 @@ function CTwitter() {
      *   --no mode
      */
     this.stream = function(mode, options, callback) {
+	var twitterPoller = new JSONPPoller()
+	, stream = new EventEmitter()
+	, buffer = [];
+
 	if(arguments.length === 2) {
 	    callback = arguments[1];
 	    options = null;
@@ -23,14 +27,12 @@ function CTwitter() {
 	    throw new Error('stream requires callback and it must be a function');
 	} else if(options !== null && typeof(options) !== 'object') {
 	    throw new Error('stream requires options parameter to be an object');
-	};
+	}
 	
-	var twitterPoller = new JSONPPoller();
-	var stream = new EventEmitter();
 	stream.emits(['data','error','destroy']);
-	stream.destroy = function() { stream.emit('destroy') };
+	stream.destroy = function() { stream.emit('destroy'); };
 	stream.on('destroy', twitterPoller.stop);
-	var buffer = [];
+
 	
 	//process mode
 	
@@ -51,5 +53,5 @@ function CTwitter() {
 	
 	//start the poller
 	//twitterPoller.start();
-    }
+    };
 }

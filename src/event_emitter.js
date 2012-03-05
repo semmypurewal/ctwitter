@@ -1,7 +1,9 @@
+'use strict';
 function EventEmitter() {
-    var listeners = {};
-    var emits = [];
-    
+    var listeners, emits;
+    listeners = {};
+    emits = [];
+
     //specifies the events that the emitter emits
     //or returns an array of events that the emitter emits
     this.emits = function(events) {
@@ -12,14 +14,14 @@ function EventEmitter() {
 		throw new Error('the argument to emits must be an array of events');
 	    } else {
 		emits = events;
-		for(i = 0; i < events.length; i++) {
+		for(i = 0; i < events.length; i=i+1) {
 		    listeners[events[i]] = [];
 		}
 	    }
 	} else {
 	    return emits;
 	}
-    }
+    };
 
     //registers an event and an observer
     this.on = function(event, listener) {
@@ -34,17 +36,17 @@ function EventEmitter() {
 	}
 	listeners[event].push(listener);
 	return this;
-    }
+    };
     
     //emits an event
     this.emit = function(event, data) {
 	var i;
 	if(listeners[event] !== undefined) {
-	    for(i = 0; i < listeners[event].length; i++) {
+	    for(i = 0; i < listeners[event].length; i=i+1) {
 		listeners[event][i](data);
 	    }
 	}
-    }
+    };
     
     //get the listeners for an event
     this.listeners = function(event) {
@@ -54,5 +56,5 @@ function EventEmitter() {
 	    throw new Error("event '" + event + "' has not yet been registered");
 	}
 	return listeners[event];
-    }
+    };
 }//end EventEmitter
