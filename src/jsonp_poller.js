@@ -51,7 +51,6 @@ define(function(require, exports, module) {
 	     * adds a script with the URL to the DOM
 	     * replaces callback=% with the actual callback based on the name
 	     * removes the previous script tag if it exists
-	     * reloads and reprocesses the data after the timeout
 	     * throws error if
 	     *   --url has not been specified
 	     */
@@ -75,12 +74,6 @@ define(function(require, exports, module) {
 		script.id = this.name()+'_script_tag_id';
 		script.src = this.url().replace('=%',"="+this.name()+'.process');
 		head.appendChild(script);
-
-		if(this.timeout() > 0) {
-		    timer = setTimeout(function() {
-			thisPoller.start();
-		    }, thisPoller.timeout()*1000);
-		};
 	    };
 
 	    /**
@@ -113,6 +106,7 @@ define(function(require, exports, module) {
 	     * accepts a function as an argument and sets it to the pre-processor
 	     * accepts an object as an argument and processes it, emitting new data
 	     *   if it is available
+	     * reloads and reprocesses the data after the timeout
 	     * throws an error if
 	     *   --argument is not a function or an object
 	     */
@@ -130,7 +124,13 @@ define(function(require, exports, module) {
 		    } else if(result && result.update) {
 			this.emit('data', result.data);
 		    }
-		    //return result.data;
+
+		    //set up the next request
+		    if(this.timeout() > 0) {
+			timer = setTimeout(function() {
+			    thisPoller.start();
+			}, thisPoller.timeout()*1000);
+		    };
 		} else {
 		    throw new Error('process requires the parameter to be an object or a function');
 		}

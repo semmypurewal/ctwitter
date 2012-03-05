@@ -4,8 +4,6 @@ describe('JSONP Poller', function() {
 	jp = new JSONPPoller();
     });
 
-
-
     it('should be an instance of EventEmitter', function() {
 	expect(jp instanceof EventEmitter).toBe(true);
     });
@@ -134,24 +132,7 @@ describe('JSONP Poller', function() {
 	    expect(scripts.length).toBe(1);
 	});
 
-	it('should reload and processes the data after the specified timeout', function() {
-	    var jp2 = new JSONPPoller();
-	    jp2.url('fixtures/public_timeline.json').timeout(1);
-	    expect(jp2.count()).toBe(0);
-	    jp2.start();
-	    expect(jp2.count()).toBe(1);
-	    runs( function() {
-		waitsFor(function() {
-		    var result = (jp2.count() === 2);
-		    return result;
-		}, "start never called a second time", 2000);
-	    });
-	    runs( function() {
-		jp2.stop();
-	    });
 
-
-	});
 
 	it('should throw error if no URL has been specified', function() {
 	    var jp2 = new JSONPPoller();
@@ -265,6 +246,23 @@ describe('JSONP Poller', function() {
 	    });
 	    jp.on('error', processStub).process({});
 	    expect(processStub).toHaveBeenCalled();
+	});
+
+	it('should reload the data after the specified timeout', function() {
+	    var jp2 = new JSONPPoller();
+	    jp2.url('fixtures/empty_object_with_callback.json').timeout(1);
+	    expect(jp2.count()).toBe(0);
+	    jp2.start();
+	    expect(jp2.count()).toBe(1);
+	    runs( function() {
+		waitsFor(function() {
+		    var result = (jp2.count() === 2);
+		    return result;
+		}, "start never called a second time", 2000);
+	    });
+	    runs( function() {
+		jp2.stop();
+	    });
 	});
 
 	it('should throw an error if the argument is not a function or an object', function() {
