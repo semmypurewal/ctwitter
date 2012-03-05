@@ -15,6 +15,7 @@
     <!-- include spec files here... -->
     <script type="text/javascript" src="event_emitter_spec.js"></script>
     <script type="text/javascript" src="jsonp_poller_spec.js"></script>
+    <script type="text/javascript" src="ctwitter_spec.js"></script>
 
   <script type="text/javascript">
     (function() {
@@ -22,10 +23,11 @@
 	    baseUrl: '../src'
 	});
 
-	require(["event_emitter", "jsonp_poller"], function(EventEmitter, JSONPPoller)  {
+	require(["event_emitter", "jsonp_poller", "ctwitter"], function(EventEmitter, JSONPPoller, CTwitter)  {
 	    //let's pollute the global namespace! Yay! (just for the tests)
 	    window.JSONPPoller = JSONPPoller;
 	    window.EventEmitter = EventEmitter;
+	    window.CTwitter = CTwitter;
 	    var jasmineEnv = jasmine.getEnv();
 	    //jasmineEnv.updateInterval = 1000;
 	    
