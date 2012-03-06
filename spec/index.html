@@ -22,32 +22,36 @@
 
   <script type="text/javascript">
     (function() {
-      var jasmineEnv = jasmine.getEnv();
-      jasmineEnv.updateInterval = 1000;
+	//pollute the global namespace for testing
+	EventEmitter = ctwitter.EventEmitter;
+	JSONPPoller = ctwitter.JSONPPoller;
+	CTwitter = ctwitter.CTwitter;
+	var jasmineEnv = jasmine.getEnv();
+	jasmineEnv.updateInterval = 1000;
+	
+	var trivialReporter = new jasmine.TrivialReporter();
 
-      var trivialReporter = new jasmine.TrivialReporter();
+	jasmineEnv.addReporter(trivialReporter);
+	
+	jasmineEnv.specFilter = function(spec) {
+            return trivialReporter.specFilter(spec);
+	};
 
-      jasmineEnv.addReporter(trivialReporter);
+	var currentWindowOnload = window.onload;
 
-      jasmineEnv.specFilter = function(spec) {
-        return trivialReporter.specFilter(spec);
-      };
+	window.onload = function() {
+            if (currentWindowOnload) {
+		currentWindowOnload();
+            }
+            execJasmine();
+	};
 
-      var currentWindowOnload = window.onload;
-
-      window.onload = function() {
-        if (currentWindowOnload) {
-          currentWindowOnload();
-        }
-        execJasmine();
-      };
-
-      function execJasmine() {
-        jasmineEnv.execute();
-      }
+	function execJasmine() {
+            jasmineEnv.execute();
+	}
 
     })();
-  </script>
+</script>
 
 </head>
 
