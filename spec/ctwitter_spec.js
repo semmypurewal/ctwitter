@@ -5,7 +5,7 @@ describe('ctwitter', function() {
     });
 
     describe('stream method', function() {
-	xit('should accept mode, options and callback', function() {
+	it('should accept mode, options and callback', function() {
 	    var goodCall = function() {
 		ct.stream('public_timeline', { }, function(stream) { 
 		    stream.destroy();
@@ -24,7 +24,7 @@ describe('ctwitter', function() {
 	});
 
 	xit('should deliver data to the client one tweet at a time', function() {
-
+	    
 	});
 
 	it('should throw an error if options exists but is not an object', function() {

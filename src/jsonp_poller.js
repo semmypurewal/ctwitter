@@ -2,7 +2,16 @@ if(!window.ctwitter || !window.ctwitter.EventEmitter) {
     throw new Error('JSONPPoller requires EventEmitter');
 }
 (function(package) {
-    var EventEmitter = package.EventEmitter;
+    var EventEmitter = package.EventEmitter
+    , i
+    , packageString;
+    //find package name?
+    for(i in window) {
+	if(window[i] === package) {
+	    packageString = i;
+	}
+    }
+
     function JSONPPoller() {
 	var url
 	, count = 0 //number of requests made
@@ -11,11 +20,13 @@ if(!window.ctwitter || !window.ctwitter.EventEmitter) {
 	, timeout = 0
 	, processor = function(data) { return {update:true, data:data}; } //default process implementation
 	, prefix = "__jp_"
-	, name;
+	, name
+	, callbackName;
 
 	JSONPPoller.instanceCount = JSONPPoller.instanceCount+1;
 	name = prefix+JSONPPoller.instanceCount;
-	window[name] = this;
+	window[packageString]['JSONPPoller'][name] = this;
+	callbackName = 'window.'+packageString+'.JSONPPoller.'+name+'.process';
 	
 	this.emits(['error','data']);
     
@@ -48,6 +59,14 @@ if(!window.ctwitter || !window.ctwitter.EventEmitter) {
 	this.name = function() {
 	    return name;
 	};
+
+	/**
+	 * callbackname
+	 * returns the callback name of this object
+	 */
+	this.callbackName = function() {
+	    return callbackName;
+	};
     
 	/**
 	 * start
@@ -77,7 +96,14 @@ if(!window.ctwitter || !window.ctwitter.EventEmitter) {
 	    script = document.createElement('script');
 	    script.type = 'text/javascript';
 	    script.id = this.name()+'_script_tag_id';
-	    script.src = this.url().replace('=%',"="+this.name()+'.process');
+	    //script.src = this.url().replace('=%',"="+this.name()+'.process');
+	    script.src = this.url().replace('=%',"="+callbackName);
+	    //add random num to fix caching problem
+	    if(script.src.match(/\?/)) {
+		script.src = script.src+'&random='+Math.floor(Math.random()*10000);
+	    } else {
+		script.src = script.src+'?random='+Math.floor(Math.random()*10000);
+	    }
 	    head.appendChild(script);
 	};
     

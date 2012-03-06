@@ -112,7 +112,7 @@ describe('JSONP Poller', function() {
 	    jp2.url("fixtures/public_timeline.json?callback=%").start();
 
 	    var script = document.getElementById(jp2.name()+"_script_tag_id");
-	    expect(script.src.match(new RegExp("callback="+jp2.name()+".process"))).toBeTruthy();
+	    expect(script.src.match(new RegExp("callback="+jp2.callbackName()))).toBeTruthy();
 	    jp2.stop();
 	});
 
