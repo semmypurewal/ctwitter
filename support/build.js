@@ -1,21 +1,19 @@
 var fs = require('fs');
-var exec = require('child_process').exec;
+var deps = ['event_emitter.js', 'jsonp_poller.js', 'ctwitter.js'];
 
-var build = '(function() {\n';
+var build = '';
 
-exec('ls src', function(err, result) {
-    var results = result.split('\n').filter(function(filename) {
-	return filename.match(/.*.js$/);
-    });
-    results.forEach(function(filename) {
-	var file = fs.readFileSync('src/'+filename, 'utf8');
-	build+=file;
-    });
+deps.forEach(function (filename) {
+    var file = fs.readFileSync('src/'+filename, 'utf8');
+    build += file;
+});
 
-    build += '\nwindow.ctwitter = CTwitter;\n';
-    build += '\n})();'
-
-    console.log(build);
+fs.writeFile('build/ctwitter-build.js', build, function(err) {
+    if (err) {
+	console.log('not ok');
+    } else {
+	console.log('ok');
+    }
 });
 
 
