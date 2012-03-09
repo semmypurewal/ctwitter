@@ -4,6 +4,27 @@ describe('ctwitter', function() {
 	ct = new CTwitter();
     });
 
+    describe('processingjs integration', function() {
+	xit('should not add processing to the window if it is undefined', function() {
+	    if(window['Processing'] === undefined) {
+		expect(window['Processing']).toBe(undefined);
+	    }
+	});
+
+	it('should add the twitterStream function to Processing if Processing is defined', function() {
+	    if(window['Processing']) {
+		expect(window.Processing.prototype.twitterStream).not.toBe(undefined);
+	    }
+	});
+
+	it('should add the onTweet function to Processing if Processing is defined', function() {
+	    if(window['Processing']) {
+		expect(window.Processing.prototype.onTweet).not.toBe(undefined);
+	    }
+	});
+    });
+
+
     describe('stream method', function() {
 	it('should accept mode, options and callback', function() {
 	    var goodCall = function() {
@@ -27,7 +48,6 @@ describe('ctwitter', function() {
 	it('should deliver data to the client one tweet at a time', function() {
 	    var stubA = jasmine.createSpy()
 	    , tweet;
-	    console.log(stubA.callCount);
 	    ct.stream('statuses/filter', { track:['bieber'] }, function (stream) {
 		stream.on('data', stubA);
 		setTimeout(stream.destroy, 3000);

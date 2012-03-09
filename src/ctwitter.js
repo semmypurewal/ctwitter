@@ -62,7 +62,7 @@ if(!window.ctwitter || !window.ctwitter.JSONPPoller || !window.ctwitter.EventEmi
 		isStreaming = false;
             });
 
-            //TODO: process mode
+            //process modes and options
 	    if (mode === 'statuses/filter') {
 		//process options for filter
 		if (!options.track && !options.location) {
@@ -110,6 +110,26 @@ if(!window.ctwitter || !window.ctwitter.JSONPPoller || !window.ctwitter.EventEmi
             //start the poller
             twitterPoller.start();
 	};
+    }
+
+    if(window['Processing']) {
+	Processing.prototype.onTweet = function(tweet) {
+	    //no by op
+	};
+
+	Processing.prototype.twitterStream = function(strings) {
+	    var that = this;
+	    var ct = new CTwitter();
+	    ct.stream('statuses/filter', { track:strings }, function(stream) {
+		stream.on('data', function(data) {
+		    that.onTweet(data);
+		});
+
+		ct.destroy = stream.destroy;
+	    });
+
+	    return ct;
+	}
     }
 
     package.CTwitter = CTwitter;
