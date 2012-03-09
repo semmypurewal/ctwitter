@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link href='http://fonts.googleapis.com/css?family=Advent+Pro:400,600' rel='stylesheet' type='text/css'>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="ctwitter.js"></script>
+    <script type="text/javascript" src="build/ctwitter-build.js"></script>
     <style>
 p {
   font-family: 'Advent Pro', sans-serif;
@@ -15,10 +15,11 @@ p {
     <script type="text/javascript">
     $(document).ready(function() {
 	var twit = new ctwitter.CTwitter();
-	twit.stream('whatever', { }, function(stream) {
+	twit.stream('statuses/filter', { track:['romney', 'obama', 'santorum'] }, function(stream) {
 	    stream.on('data', function(tweet) {
-		$('<p>'+tweet.id_str+'</p>').hide().prependTo('#tweets').slideDown();
+		$('<p>'+tweet.text+'</p>').hide().prependTo('#tweets').slideDown();
 	    });
+	    setTimeout(stream.destroy, 20000);
 	});
     });
     </script>

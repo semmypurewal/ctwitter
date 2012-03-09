@@ -7,29 +7,71 @@ describe('ctwitter', function() {
     describe('stream method', function() {
 	it('should accept mode, options and callback', function() {
 	    var goodCall = function() {
-		ct.stream('public_timeline', { }, function(stream) { 
+		ct.stream('statuses/filter', { track:['bieber'] }, function(stream) { 
 		    stream.destroy();
 		});
 	    };
 	    expect(goodCall).not.toThrow();
 	});
 
-	it('should accept mode and callback with no options', function() {
+	//this is only if we can find a mode that doesn't require options
+	xit('should accept mode and callback with no options', function() {
 	    var goodCall = function() {
-		ct.stream('public_timeline', function() {
+		ct.stream('statuses/filter', function() {
 		    stream.destroy();
 		});
 		expect(goodCall).not.toThrow();
 	    };
 	});
 
-	xit('should deliver data to the client one tweet at a time', function() {
-	    
+	it('should deliver data to the client one tweet at a time', function() {
+	    var stubA = jasmine.createSpy()
+	    , tweet;
+	    console.log(stubA.callCount);
+	    ct.stream('statuses/filter', { track:['bieber'] }, function (stream) {
+		stream.on('data', stubA);
+		setTimeout(stream.destroy, 3000);
+	    });
+
+	    waits(1000);
+	    runs(function () {
+		expect(stubA).toHaveBeenCalled();
+		tweet = stubA.mostRecentCall.args[0];
+		expect(tweet.text).not.toBe(undefined);
+		expect(tweet.created_at).not.toBe(undefined);
+
+	    });
+	    waits(1000);
+	    runs(function () {
+		expect(stubA.callCount).toBeGreaterThan(1);
+		tweet = stubA.mostRecentCall.args[0];
+		expect(tweet.text).not.toBe(undefined);
+		expect(tweet.created_at).not.toBe(undefined);
+	    });
+
+	});
+
+	it('should throw an error in the statuses/filter method if no track or location option is specified', function() {
+	    var badCall = function() {
+		ct.stream('statuses/filter', { }, function(stream) {
+		    stream.destroy();
+		});
+	    }
+	    expect(badCall).toThrow(new Error('statuses/filter mode requires a location or track option'));
+	});
+
+	it('should throw an error if the statuses/filter track option is not an array or a string', function() {
+	    var badCall = function() {
+		ct.stream('statuses/filter', { track:5 }, function(stream) {
+		    stream.destroy();
+		});
+	    }
+	    expect(badCall).toThrow(new Error('statuses/filter track option should be a string or an array of strings'));
 	});
 
 	it('should throw an error if options exists but is not an object', function() {
 	    var badCall = function() {
-		ct.stream('public_timeline', 156, function() {
+		ct.stream('statuses/filter', 156, function() {
 		    stream.destroy();
 		});
 	    };
@@ -45,14 +87,14 @@ describe('ctwitter', function() {
 
 	it('should throw an error when no callback is specified', function() {
 	    var badCall = function() {
-		ct.stream('public_timeline', { });
+		ct.stream('statuses/filter', { track:['bieber']});
 	    };
 	    expect(badCall).toThrow(new Error('stream requires callback and it must be a function'));
 	});
 
 	it('should throw an error when callback is not a function', function() {
 	    var badCall = function() {
-		ct.stream('public_timeline', { }, 5);
+		ct.stream('statuses/filter', {track:['bieber']}, 5);
 	    };
 	    expect(badCall).toThrow(new Error('stream requires callback and it must be a function'));
 	});

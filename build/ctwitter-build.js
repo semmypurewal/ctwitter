@@ -290,12 +290,13 @@ if(!window.ctwitter) window.ctwitter = { };
             , buffer = []
             , bufferTimeout
 	    , lastID
+	    , query
 	    , isStreaming = false
             , deliverData = function (stream) {
 		isStreaming = true;
 		stream.emit('data',buffer.shift());
 		if (buffer.length > 0) {
-		    console.log(lastID < buffer[0].id_str);
+		    //console.log(lastID < buffer[0].id_str);
 		    lastID = buffer[0].id_str;
                     bufferTimeout = setTimeout(function () {
 			deliverData(stream);
@@ -323,12 +324,31 @@ if(!window.ctwitter) window.ctwitter = { };
             stream.on('destroy', function () {
 		twitterPoller.stop();
 		clearTimeout(bufferTimeout);
+		isStreaming = false;
             });
 
             //TODO: process mode
-            //TODO: process options
+	    if (mode === 'statuses/filter') {
+		//process options for filter
+		if (!options.track && !options.location) {
+		    throw new Error('statuses/filter mode requires a location or track option');
+		} else if (options.track && !(options.track instanceof Array) && typeof(options.track) !== 'string') {
+		    throw new Error('statuses/filter track option should be a string or an array of strings');
+		} else if(options.track) {
+		    //build query part of url
+		    if (options.track instanceof Array) {
+			query = 'q='+options.track.join('+OR+');
+		    } else {
+			query = 'q='+options.track;
+		    }
+		}
+	    } else {
+		throw new Error("current supported modes: 'statuses/filter'");
+	    }
+
+
         
-            twitterPoller.url('http://search.twitter.com/search.json?rpp=100&q=bieber&callback=%').timeout(timeout).process(function (data) {
+            twitterPoller.url('http://search.twitter.com/search.json?rpp=100&'+query+'&result_Type=recent&callback=%').timeout(timeout).process(function (data) {
 		var i
 		, nextUrl;
 		

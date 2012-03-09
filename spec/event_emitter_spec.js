@@ -4,7 +4,7 @@ describe('Event Emitter', function() {
 	e = new EventEmitter();
     });
 
-    it('implements the Event Emitter interface', function() {
+    it('should implement the Event Emitter interface', function() {
 	var i;
 	var interface = ['emits', 'on', 'emit', 'listeners'];
 	for(i = 0; i < interface.length; i++) {
@@ -14,17 +14,17 @@ describe('Event Emitter', function() {
     });
 
     describe('emits method', function() {
-	it('accepts an array of events that it emits', function() {
+	it('should accept an array of events that it emits', function() {
 	    e.emits(['event1', 'event2', 'event3']);
 	});
 
-	it('returns an array of events that it emits', function() {
+	it('should return an array of events that it emits', function() {
 	    expect(e.emits()).toEqual([]);
 	    e.emits(['event1', 'event2', 'event3']);
 	    expect(e.emits()).toEqual(['event1', 'event2', 'event3']);
 	});
 
-	it('throws an error if the argument is not undefined and also not an array', function() {
+	it('should throw an error if the argument is not undefined and also not an array', function() {
 	    var badCall = function() {
 		e.emits('event');
 	    }
@@ -37,7 +37,7 @@ describe('Event Emitter', function() {
 	    e.emits(['event','event1','event2']);
 	});
 
-	it('returns the listeners for a given event', function() {
+	it('should return the listeners for a given event', function() {
 	    var listener1 = function() {
 	    };
 
@@ -49,7 +49,7 @@ describe('Event Emitter', function() {
 	    expect(e.listeners('event')).toEqual([listener1, listener2]);
 	});
 
-	it('throws an error if the method is called without a string', function() {
+	it('should throw an error if the method is called without a string', function() {
 	    expect(function() { e.listeners() }).toThrow(new Error('listeners method must be called with the name of an event'));
 	});
     });
@@ -59,56 +59,56 @@ describe('Event Emitter', function() {
 	    e.emits(['event','event1','event2']);
 	});
 
-	it('registers a callback on an event', function() {
+	it('should register a callback on an event', function() {
 	    e.on('event', function() {});
 	    expect(e.listeners('event').length).toBe(1);
 	});
 	
-	it('registers multiple callbacks for a single event', function() {
+	it('should register multiple callbacks for a single event', function() {
 	    e.on('event', function() { console.log("function 1") });
 	    e.on('event', function() { console.log("function 2") });
 	    expect(e.listeners('event').length).toBe(2);
 	});
 	
-	it('registers callbacks for multiple events', function() {
+	it('should register callbacks for multiple events', function() {
 	    e.on('event1', function() { });
 	    e.on('event2', function() { });
 	    expect(e.listeners('event1').length).toBe(1);
 	    expect(e.listeners('event2').length).toBe(1);
 	});
 
-	it('returns an instance of EventEmitter so the call can be chained', function() {
+	it('should return an instance of EventEmitter so the call can be chained', function() {
 	   expect(e.on('event', function() {}) instanceof EventEmitter).toBeTruthy();
 	});
 
-	it('registers callbacks to be registered in a chain', function() {
+	it('should register callbacks to be registered in a chain', function() {
 	    e.on('event1', function() { })
 		.on('event2', function() { });
 	    expect(e.listeners('event1').length).toBe(1);
 	    expect(e.listeners('event2').length).toBe(1);	    
 	});
 
-	it('registers multiple callbacks for a single event in a chain', function() {
+	it('should register multiple callbacks for a single event in a chain', function() {
 	    e.on('event', function() { console.log("function 1") })
 		.on('event', function() { console.log("function 2") });
 	    expect(e.listeners('event').length).toBe(2);
 	});
 
-	it('throws an error if the event is not emitted', function() {
+	it('should throw an error if the event is not emitted', function() {
 	    var badCall = function() {
 		e.on('event3', function() {});
 	    };
 	    expect(badCall).toThrow(new Error("'event3' is not emitted by this EventEmitter"));
 	});
 
-	it('throws an error if the event is not a string', function() {
+	it('should throw an error if the event is not a string', function() {
 	    var badCall = function() {
 		e.on(1, function() { });
 	    }
 	    expect(badCall).toThrow(new Error("first argument to 'on' should be a string"));
 	});
 	
-	it('throws an error if the listener is not a function', function() {
+	it('should throw an error if the listener is not a function', function() {
 	    var badCall = function() {
 		e.on('event', 1);
 	    }
@@ -125,7 +125,7 @@ describe('Event Emitter', function() {
 	    stubB = jasmine.createSpy('stubB');
 	});
 
-	it('responds with a correct listener and data when an event is emitted', function() {
+	it('should respond with a correct listener and data when an event is emitted', function() {
 	    e.on('event1', stubA);
 	    e.emit('event1');
 	    expect(stubA).toHaveBeenCalledWith(undefined);
@@ -133,7 +133,7 @@ describe('Event Emitter', function() {
 	    expect(stubA).toHaveBeenCalledWith(5);
 	});
 
-	it('does not respond with incorrect listener when an event is emitted', function() {
+	it('should not respond with incorrect listener when an event is emitted', function() {
 	    e.on('event1', stubA);
 	    e.on('event2', stubB);
 	    e.emit('event1');
@@ -141,7 +141,7 @@ describe('Event Emitter', function() {
 	    expect(stubB).not.toHaveBeenCalled();
 	});
 
-	it('responds with all listeners when an event is emitted', function() {
+	it('should respond with all listeners when an event is emitted', function() {
 	    e.on('event1', stubA);
 	    e.on('event1', stubB);
 	    e.emit('event1', 5);
@@ -149,6 +149,4 @@ describe('Event Emitter', function() {
 	    expect(stubB).toHaveBeenCalledWith(5);
 	});
     }); //end description of 'emit' method
-
-
 });
