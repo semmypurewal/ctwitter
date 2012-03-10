@@ -107,9 +107,9 @@ describe('JSONP Poller', function() {
 	    expect(script.src.match(new RegExp(jp.url().substring(0,jp.url().indexOf('?'))))).toBeTruthy();
 	});
 
-	it('should replace the % in the callback with the name of this process function', function() {
+	it('should replace the =* in the callback with the name of this process function', function() {
 	    var jp2 = new JSONPPoller();
-	    jp2.url("fixtures/public_timeline.json?callback=%").start();
+	    jp2.url("fixtures/public_timeline.json?callback=*").start();
 
 	    var script = document.getElementById(jp2.name()+"_script_tag_id");
 	    expect(script.src.match(new RegExp("callback="+jp2.callbackName()))).toBeTruthy();

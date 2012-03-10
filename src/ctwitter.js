@@ -25,13 +25,13 @@ if(!window.ctwitter || !window.ctwitter.JSONPPoller || !window.ctwitter.EventEmi
             , buffer = []
             , bufferTimeout
 	    , lastID
-	    , query
+	    , query = ''
+	    , newOptions = []
 	    , isStreaming = false
             , deliverData = function (stream) {
 		isStreaming = true;
 		stream.emit('data',buffer.shift());
 		if (buffer.length > 0) {
-		    //console.log(lastID < buffer[0].id_str);
 		    lastID = buffer[0].id_str;
                     bufferTimeout = setTimeout(function () {
 			deliverData(stream);
@@ -72,37 +72,68 @@ if(!window.ctwitter || !window.ctwitter.JSONPPoller || !window.ctwitter.EventEmi
 		} else if(options.track) {
 		    //build query part of url
 		    if (options.track instanceof Array) {
-			query = 'q='+options.track.join('+OR+');
+			newOptions = [];
+			options.track.forEach(function (elt, i) {
+			    newOptions[i] = escape(elt);
+			});
+			query += 'q='+newOptions.join('+OR+');
 		    } else {
-			query = 'q='+options.track;
+			options.track = escape(options.track);
+			query += 'q='+escape(options.track);
 		    }
 		}
+		//process location
+		if (options.location) {
+		    if (query !== '') {
+			query += '&geocode='+options.location;
+		    } else {
+			query += 'geocode='+options.location;
+		    }
+		}
+		if (options.lang) {
+		    query += '&lang='+options.lang;
+		}
+		//add entities
+		query += '&include_entities=true';
 	    } else {
 		throw new Error("current supported modes: 'statuses/filter'");
 	    }
 
 
         
-            twitterPoller.url('http://search.twitter.com/search.json?rpp=100&'+query+'&result_Type=recent&callback=%').timeout(timeout).process(function (data) {
-		var i
-		, nextUrl;
+            twitterPoller.url('http://search.twitter.com/search.json?rpp=100&'+query+'&result_Type=recent&callback=*')
+		.timeout(timeout)
+		.process(function (data) {
+		    var nextUrl
+		    , result = {};
+		    
+		    if(data.results.length > 0) {
+			result.update = true;
+		    } else {
+			result.update = false;
+		    }
+		    result.data = data;
 		
-		//TODO: check frequency of data to set up bufferTimeout and next polling timeout??
-		
-		//set up buffer to deliver data
-		for (i = data.results.length - 1; i > 0; i = i - 1) {
-                    buffer.push(data.results[i]);
-		}
+		    //TODO: check frequency of data to set up bufferTimeout and next polling timeout??
+		    
+		    //update poller and timeout for next request
+		    nextUrl = 'http://search.twitter.com/search.json?rpp=100&result_type=recent' + data.refresh_url + '&callback=*';
+		    twitterPoller.url(nextUrl).timeout(timeout);
+		    return result;
+		})
+		.on('data', function (data) {
+		    var i;
+		    //set up buffer to deliver data
+		    for (i = data.results.length - 1; i > 0; i = i - 1) {
+			buffer.push(data.results[i]);
+		    }
 
-		//deliver data if it's not already being delivered
-		if (!isStreaming) {
-                    deliverData(stream);
-		}
+		    //deliver data if it's not already being delivered
+		    if (!isStreaming && buffer.length > 0) {
+			deliverData(stream);
+		    }
+		})
 
-		//update poller and timeout for next request
-		nextUrl = 'http://search.twitter.com/search.json?rpp=100&result_type=recent' + data.refresh_url + '&callback=%';
-		twitterPoller.url(nextUrl).timeout(timeout);
-            });
 
             //set up the poller as specified by the client
             callback(stream);

@@ -72,7 +72,7 @@ if(!window.ctwitter || !window.ctwitter.EventEmitter) {
 	 * start
 	 * starts polling
 	 * adds a script with the URL to the DOM
-	 * replaces callback=% with the actual callback based on the name
+	 * replaces callback=* with the actual callback based on the name
 	 * removes the previous script tag if it exists
 	 * throws error if
 	 *   --url has not been specified
@@ -97,13 +97,14 @@ if(!window.ctwitter || !window.ctwitter.EventEmitter) {
 	    script.type = 'text/javascript';
 	    script.id = this.name()+'_script_tag_id';
 	    //script.src = this.url().replace('=%',"="+this.name()+'.process');
-	    script.src = this.url().replace('=%',"="+callbackName);
+	    script.src = this.url().replace('=*',"="+callbackName);
 	    //add random num to fix caching problem
 	    if(script.src.match(/\?/)) {
 		script.src = script.src+'&random='+Math.floor(Math.random()*10000);
 	    } else {
 		script.src = script.src+'?random='+Math.floor(Math.random()*10000);
 	    }
+
 	    head.appendChild(script);
 	};
     
