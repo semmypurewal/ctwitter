@@ -4,23 +4,35 @@
     <meta charset="UTF-8">
     <link href='http://fonts.googleapis.com/css?family=Advent+Pro:400,600' rel='stylesheet' type='text/css'>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script type="text/javascript" src="build/ctwitter-build.js"></script>
+    <script type="text/javascript" src="../build/ctwitter-build.js"></script>
     <style>
-p {
+body {
+  background: #8ec1da;
+  width: 600px;
+  margin: auto;
+}
+
+.tweet {
+  border: 3px solid #bed0da;
+  background: #c0deed;
+  min-height: 60px;
+  border-radius: 5px;
+}
+
+.tweet img {
+  float: right;
+  margin-right: 6px;
+}
+
+p.tweet {
   font-family: 'Advent Pro', sans-serif;
   font-weight: bold;
+  padding-top: 6px;
+  padding-left: 5px;
 }
 
 .blue {
   color: blue;
-}
-
-.red {
-  color: red;
-}
-
-.green {
-  color: #afa;
 }
     </style>
 
@@ -35,10 +47,13 @@ p {
 		    term = term.replace(/\"|\'/ig, '');
 		    tweet.text = tweet.text.replace(new RegExp('('+term+')','ig'), "<span class='blue'>$1</span>");
 		});
-		$('<p>'+tweet.text+'</p>').hide().prependTo('#tweets').slideDown();
-		$('#tweets p:gt(10)').fadeOut(500, function() { $(this).remove() });
+		$('<p class="tweet"><img src="'+tweet.profile_image_url+'" />'+tweet.text+'</p>')
+		    .hide()
+		    .prependTo('#tweets')
+		    .slideDown(50);
+		$('#tweets p:gt(5)')
+		    .fadeOut(500, function() { $(this).remove() });
 	    });
-	    //setTimeout(stream.destroy, 20000);
 	});
     });
     </script>
