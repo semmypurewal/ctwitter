@@ -8,7 +8,7 @@ deps.forEach(function (filename) {
     build += file;
 });
 
-fs.writeFile('build/ctwitter-build.js', build, function(err) {
+fs.writeFile('build/ctwitter.js', build, function(err) {
     if (err) {
 	console.log('not ok');
     } else {

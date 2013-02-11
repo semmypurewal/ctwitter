@@ -19,3 +19,13 @@ API
 
 Documentation coming soon. In the meantime, take a look at the examples in the examples folder. It's designed
 to be very similar to the Node.js ntwitter library.
+
+Example
+=======
+
+    var twitter = new CTwitter.ctwitter();
+    twitter.stream("statuses/filter", { lang:"en", track:["node.js", "javascript"] }, function (stream) {
+        stream.on("data", function (tweet) {
+            console.log(tweet.text);
+        });
+    }
