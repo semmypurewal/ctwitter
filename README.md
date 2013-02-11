@@ -23,7 +23,7 @@ to be very similar to the Node.js ntwitter library.
 Example
 =======
 
-    var twitter = new CTwitter.ctwitter();
+    var twitter = new ctwitter.CTwitter();
     twitter.stream("statuses/filter", { lang:"en", track:["node.js", "javascript"] }, function (stream) {
         stream.on("data", function (tweet) {
             console.log(tweet.text);
