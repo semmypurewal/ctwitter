@@ -28,4 +28,4 @@ Example
         stream.on("data", function (tweet) {
             console.log(tweet.text);
         });
-    }
+    });
